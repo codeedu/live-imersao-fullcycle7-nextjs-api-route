@@ -1,7 +1,7 @@
-//import { useEffect, useState } from "react";
-import axios from "axios";
 import { GetServerSideProps, NextPage } from "next";
-
+import { useEffect, useState } from "react";
+import { http } from "../../util/http";
+import useSWR from 'swr';
 type User = {
   name: string;
 };
@@ -10,16 +10,24 @@ type UserPageProps = {
   users: User[];
 };
 
-const url = "https://my-json-server.typicode.com/codeedu/live-imersao-fullcycle7-nextjs/users"
+const fetcher = (url: string) => http.get(url).then((res) => res.data);
+
 
 const UsersPage: NextPage<UserPageProps> = (props) => {
-  const { users } = props;
-  // const [users, setUsers] = useState([]);
+  const { users: usersProp } = props;
+  // const [users, setUsers] = useState(usersProp);
+
+
+  const {data: users, error} = useSWR('api/users', fetcher, {
+    fallbackData: usersProp,
+    refreshInterval: 1000,
+    shouldRetryOnError: true
+  });
 
   // useEffect(() => {
-  //   axios
-  //     .get(url)
-  //     .then((response) => setUsers(response.data));
+  //   setInterval(() => {
+  //     http.get("api/users").then((response) => setUsers(response.data));
+  //   }, 1000);
   // }, []);
 
   return (
@@ -37,12 +45,14 @@ const UsersPage: NextPage<UserPageProps> = (props) => {
 export default UsersPage;
 
 export const getServerSideProps: GetServerSideProps = async () => {
-  const { data } = await axios.get(url);
-  
+  const { data } = await http.get("api/users");
+
   return {
     props: {
       users: data,
     },
-
   };
 };
+
+//organizar as urls
+//autenticação

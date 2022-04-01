@@ -1,0 +1,13 @@
+GET http://localhost:3000/api/hello
+
+###
+GET http://localhost:3000/api/email
+Content-Type: application/json
+
+{
+    "assunto": "valor assunto",
+    "conteudo": "valor conteudo"
+}
+
+###
+GET http://localhost:3000/api/users
